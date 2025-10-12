@@ -1,0 +1,1937 @@
+// Student Dashboard JavaScript
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    initializeAnimations();
+    initializeInteractivity();
+    initializeDarkMode();
+    loadDashboardData();
+});
+
+// Chart initialization
+function initializeCharts() {
+    initializeProgressChart();
+    initializePerformanceChart();
+}
+
+// Progress Chart (Learning Progress over time)
+function initializeProgressChart() {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+            datasets: [{
+                label: 'Study Hours',
+                data: [15, 18, 22, 25, 20, 28, 30, 24],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Quiz Scores (%)',
+                data: [75, 78, 85, 82, 88, 90, 92, 89],
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Assignment Completion (%)',
+                data: [80, 85, 90, 88, 95, 92, 98, 96],
+                borderColor: '#ffc107',
+                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            },
+            elements: {
+                point: {
+                    radius: 4,
+                    hoverRadius: 6
+                }
+            }
+        }
+    });
+}
+
+// Performance Chart (Subject-wise performance)
+function initializePerformanceChart() {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Mathematics', 'Physics', 'Computer Science', 'Machine Learning', 'Statistics', 'Algorithms'],
+            datasets: [{
+                label: 'Current Performance',
+                data: [85, 78, 92, 88, 75, 90],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                pointBackgroundColor: '#0d6efd',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#0d6efd'
+            }, {
+                label: 'Target Performance',
+                data: [90, 85, 95, 92, 85, 95],
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                pointBackgroundColor: '#198754',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#198754'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    },
+                    angleLines: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Animation initialization
+function initializeAnimations() {
+    // Add fade-in animation to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+    });
+
+    // Add slide-in animation to sidebar
+    const sidebar = document.querySelector('.sidebar-content');
+    if (sidebar) {
+        sidebar.classList.add('slide-in-left');
+    }
+
+    // Animate progress bars
+    animateProgressBars();
+}
+
+// Animate progress bars
+function animateProgressBars() {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+}
+
+// Initialize interactive features
+function initializeInteractivity() {
+    // Add click handlers for quick actions
+    initializeQuickActions();
+    
+    // Add click handlers for navigation items
+    initializeNavigation();
+    
+    // Add hover effects for course cards
+    initializeCourseCardEffects();
+    
+    // Initialize session booking
+    initializeSessionBooking();
+    
+    // Initialize AI recommendations
+    initializeAIRecommendations();
+    
+    // Update real-time data
+    updateRealTimeData();
+}
+
+// Navigation functionality
+function initializeNavigation() {
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const linkText = this.textContent.trim();
+            
+            switch(true) {
+                case linkText.includes('About'):
+                    handleAbout();
+                    break;
+                case linkText.includes('Feedback'):
+                    handleFeedback();
+                    break;
+                case linkText.includes('Dashboard'):
+                    handleDashboard();
+                    break;
+            }
+        });
+    });
+}
+
+// Quick actions functionality
+function initializeQuickActions() {
+    const quickActions = document.querySelectorAll('.list-group-item');
+    
+    quickActions.forEach(action => {
+        action.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const actionText = this.textContent.trim();
+            
+            switch(true) {
+                case actionText.includes('Continue Learning'):
+                    handleContinueLearning();
+                    break;
+                case actionText.includes('Take Quiz'):
+                    handleTakeQuiz();
+                    break;
+                case actionText.includes('Look Flashcards'):
+                    handleLookFlashcards();
+                    break;
+                case actionText.includes('Mindmap'):
+                    handleMindmap();
+                    break;
+                case actionText.includes('View Achievements'):
+                    handleViewAchievements();
+                    break;
+                case actionText.includes('AI Tutor Chat'):
+                    handleAITutorChat();
+                    break;
+            }
+        });
+    });
+}
+
+// Course card effects
+function initializeCourseCardEffects() {
+    const courseCards = document.querySelectorAll('.course-card');
+    
+    courseCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const courseTitle = this.querySelector('.course-title').textContent;
+            showCourseDetails(courseTitle);
+        });
+    });
+}
+
+// Session booking functionality
+function initializeSessionBooking() {
+    const recommendationButtons = document.querySelectorAll('.recommendation-item button');
+    
+    recommendationButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const recommendationType = this.textContent.trim();
+            handleRecommendationAction(recommendationType);
+        });
+    });
+}
+
+// AI recommendations
+function initializeAIRecommendations() {
+    const recommendationButtons = document.querySelectorAll('.recommendation-item button');
+    
+    recommendationButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const recommendationType = this.textContent.trim();
+            handleRecommendationAction(recommendationType);
+        });
+    });
+}
+
+// Action handlers
+function handleContinueLearning() {
+    showNotification('Redirecting to your current course...', 'info');
+    // Simulate navigation
+    setTimeout(() => {
+        showNotification('Welcome back to Machine Learning Fundamentals!', 'success');
+    }, 1500);
+}
+
+function handleTakeQuiz() {
+    showNotification('Loading available quizzes...', 'info');
+    // Simulate quiz selection
+    setTimeout(() => {
+        showQuizSelection();
+    }, 1000);
+}
+
+function handleLookFlashcards() {
+    showNotification('Loading flashcard collections...', 'info');
+    // Simulate flashcard selection
+    setTimeout(() => {
+        showFlashcardCollections();
+    }, 1000);
+}
+
+function handleMindmap() {
+    showNotification('Loading mindmap generator...', 'info');
+    // Simulate mindmap tool
+    setTimeout(() => {
+        showMindmapOptions();
+    }, 1000);
+}
+
+function handleViewAchievements() {
+    showNotification('Loading your achievements...', 'info');
+    // Simulate achievements view
+    setTimeout(() => {
+        showAchievements();
+    }, 1000);
+}
+
+function handleAITutorChat() {
+    showNotification('Starting AI Tutor session...', 'info');
+    // Redirect to AI Tutor Chat page
+    setTimeout(() => {
+        window.open('ai-tutor-chat.html', '_blank');
+        showNotification('AI Tutor opened in new tab! 🤖', 'success');
+    }, 1000);
+}
+
+// Navigation handlers
+function handleAbout() {
+    showNotification('Loading platform information...', 'info');
+    setTimeout(() => {
+        showAboutModal();
+    }, 1000);
+}
+
+function handleFeedback() {
+    showNotification('Opening feedback form...', 'info');
+    setTimeout(() => {
+        showFeedbackModal();
+    }, 1000);
+}
+
+function handleDashboard() {
+    showNotification('Refreshing dashboard...', 'info');
+    // Dashboard is already the current page
+}
+
+function showCourseDetails(courseTitle) {
+    showNotification(`Loading details for ${courseTitle}...`, 'info');
+}
+
+function handleRecommendationAction(actionType) {
+    switch(actionType) {
+        case 'Start Practice':
+        case 'View Practice':
+            showNotification('Loading practice problems for calculus...', 'info');
+            break;
+        case 'Start Session':
+            showNotification('Starting AI-guided study session...', 'info');
+            break;
+        case 'Take Quiz':
+            showNotification('Preparing practice quiz...', 'info');
+            break;
+        case 'Study Flashcards':
+            showNotification('Loading flashcard collections...', 'info');
+            setTimeout(() => {
+                handleLookFlashcards();
+            }, 1000);
+            break;
+        case 'Create Mindmap':
+            showNotification('Loading mindmap generator...', 'info');
+            setTimeout(() => {
+                handleMindmap();
+            }, 1000);
+            break;
+        case 'View Achievements':
+            showNotification('Loading your achievements...', 'info');
+            setTimeout(() => {
+                handleViewAchievements();
+            }, 1000);
+            break;
+        case 'AI Tutor Chat':
+            showNotification('Connecting to AI Tutor...', 'info');
+            setTimeout(() => {
+                handleAITutorChat();
+            }, 1000);
+            break;
+        case 'Begin Assessment':
+            showNotification('Loading skill assessment...', 'info');
+            break;
+        default:
+            showNotification(`Processing: ${actionType}`, 'info');
+    }
+}
+
+// Utility functions
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 100px; right: 20px; z-index: 9999; min-width: 300px;';
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto dismiss after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+function showQuizSelection() {
+    const courses = [
+        { 
+            title: 'Advanced Mathematics', 
+            subject: 'Mathematics', 
+            description: 'Calculus, Linear Algebra, and Statistics',
+            icon: 'fa-calculator',
+            color: 'danger'
+        },
+        { 
+            title: 'Machine Learning Fundamentals', 
+            subject: 'Computer Science', 
+            description: 'Algorithms, Neural Networks, and Data Science',
+            icon: 'fa-robot',
+            color: 'primary'
+        },
+        { 
+            title: 'Physics for Engineers', 
+            subject: 'Physics', 
+            description: 'Mechanics, Thermodynamics, and Electromagnetism',
+            icon: 'fa-atom',
+            color: 'info'
+        },
+        { 
+            title: 'Python Programming', 
+            subject: 'Programming', 
+            description: 'Syntax, Data Structures, and Object-Oriented Programming',
+            icon: 'fa-code',
+            color: 'success'
+        },
+        { 
+            title: 'Data Structures & Algorithms', 
+            subject: 'Computer Science', 
+            description: 'Arrays, Trees, Graphs, and Algorithm Complexity',
+            icon: 'fa-project-diagram',
+            color: 'warning'
+        },
+        { 
+            title: 'Digital Signal Processing', 
+            subject: 'Engineering', 
+            description: 'Signals, Filters, and Fourier Transforms',
+            icon: 'fa-wave-square',
+            color: 'purple'
+        }
+    ];
+    
+    let coursesHTML = '<div class="row">';
+    courses.forEach(course => {
+        coursesHTML += `
+            <div class="col-md-6 mb-3">
+                <div class="card course-quiz-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="course-icon bg-${course.color} me-3">
+                                <i class="fas ${course.icon} text-white"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="card-title mb-1">${course.title}</h6>
+                                <small class="text-muted">${course.subject}</small>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted mb-3">${course.description}</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-${course.color} btn-sm flex-grow-1" onclick="startCourseQuiz('${course.title}')">
+                                <i class="fas fa-check me-1"></i>Select
+                            </button>
+                            <button class="btn btn-outline-${course.color} btn-sm" onclick="viewCourseDetails('${course.title}')" title="Course Details">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    coursesHTML += '</div>';
+    
+    showModal('Available Courses to Take Quiz', coursesHTML);
+}
+
+function startCourseQuiz(courseTitle) {
+    showQuizConfigForm(courseTitle);
+}
+
+function showQuizConfigForm(courseTitle) {
+    const formHTML = `
+        <form id="quizConfigForm">
+            <div class="mb-3">
+                <label for="quizTopic" class="form-label">Topic <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="quizTopic" placeholder="Enter specific topic (e.g., Calculus, Machine Learning Basics)" required>
+                <div class="form-text">Specify the topic you want to focus on for this quiz</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="questionCount" class="form-label">Number of Questions <span class="text-danger">*</span></label>
+                <select class="form-select" id="questionCount" required>
+                    <option value="">Select number of questions</option>
+                    <option value="5">5 Questions (Quick Quiz)</option>
+                    <option value="10">10 Questions (Standard)</option>
+                    <option value="15">15 Questions (Extended)</option>
+                    <option value="20">20 Questions (Comprehensive)</option>
+                    <option value="25">25 Questions (Full Test)</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label for="difficulty" class="form-label">Difficulty Level <span class="text-danger">*</span></label>
+                <select class="form-select" id="difficulty" required>
+                    <option value="">Select difficulty level</option>
+                    <option value="easy">🟢 Easy - Basic concepts and fundamental questions</option>
+                    <option value="medium">🟡 Medium - Intermediate level with applied problems</option>
+                    <option value="hard">🔴 Hard - Advanced concepts and complex scenarios</option>
+                </select>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1" id="startQuizBtn">
+                    <i class="fas fa-play me-2"></i>Start Quiz
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="cancelQuizBtn">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    showModal(`Configure Quiz - ${courseTitle}`, formHTML);
+    
+    // Add event listeners after modal is shown
+    setTimeout(() => {
+        const form = document.getElementById('quizConfigForm');
+        const cancelBtn = document.getElementById('cancelQuizBtn');
+        
+        if (form) {
+            console.log('Adding form submit listener');
+            form.addEventListener('submit', function(event) {
+                startConfiguredQuiz(event, courseTitle);
+            });
+        } else {
+            console.error('Form not found!');
+        }
+        
+        if (cancelBtn) {
+            console.log('Adding cancel button listener');
+            cancelBtn.addEventListener('click', function() {
+                closeModal();
+            });
+        } else {
+            console.error('Cancel button not found!');
+        }
+    }, 100);
+}
+
+function startConfiguredQuiz(event, courseTitle) {
+    console.log('startConfiguredQuiz called with:', courseTitle);
+    event.preventDefault();
+    
+    const topic = document.getElementById('quizTopic').value.trim();
+    const questionCount = document.getElementById('questionCount').value;
+    const difficulty = document.getElementById('difficulty').value;
+    
+    console.log('Form values:', { topic, questionCount, difficulty });
+    
+    if (!topic || !questionCount || !difficulty) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Store quiz configuration for the quiz page
+    const quizConfig = {
+        course: courseTitle,
+        topic: topic,
+        questions: parseInt(questionCount),
+        difficulty: difficulty,
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log('Storing quiz config:', quizConfig);
+    localStorage.setItem('currentQuizConfig', JSON.stringify(quizConfig));
+    
+    // Close modal and start quiz
+    console.log('Closing modal and starting quiz...');
+    closeModal();
+    
+    // Small delay to ensure modal closes smoothly
+    setTimeout(() => {
+        startQuiz(courseTitle);
+    }, 300);
+}
+
+function viewCourseDetails(courseTitle) {
+    showNotification(`Loading ${courseTitle} course details...`, 'info');
+    
+    // Course details data
+    const courseDetails = {
+        'Advanced Mathematics': {
+            description: 'Master advanced mathematical concepts including calculus, linear algebra, and statistics.',
+            topics: ['Differential Calculus', 'Integral Calculus', 'Linear Algebra', 'Statistics', 'Probability Theory'],
+            progress: '90%',
+            nextTopic: 'Advanced Statistics'
+        },
+        'Machine Learning Fundamentals': {
+            description: 'Learn the foundations of machine learning, algorithms, and data science applications.',
+            topics: ['Supervised Learning', 'Unsupervised Learning', 'Neural Networks', 'Deep Learning', 'Data Preprocessing'],
+            progress: '75%',
+            nextTopic: 'Deep Learning Basics'
+        },
+        'Physics for Engineers': {
+            description: 'Apply physics principles to engineering problems including mechanics and electromagnetism.',
+            topics: ['Classical Mechanics', 'Thermodynamics', 'Electromagnetism', 'Quantum Physics', 'Relativity'],
+            progress: '45%',
+            nextTopic: 'Electromagnetic Fields'
+        }
+    };
+    
+    const details = courseDetails[courseTitle] || {
+        description: 'Comprehensive course covering essential concepts and practical applications.',
+        topics: ['Fundamentals', 'Intermediate Concepts', 'Advanced Topics', 'Practical Applications'],
+        progress: '60%',
+        nextTopic: 'Advanced Concepts'
+    };
+    
+    const detailsHTML = `
+        <div class="course-details">
+            <h5>${courseTitle}</h5>
+            <p class="text-muted mb-3">${details.description}</p>
+            
+            <div class="row mb-3">
+                <div class="col-6">
+                    <strong>Progress:</strong>
+                    <div class="progress mt-1">
+                        <div class="progress-bar bg-success" style="width: ${details.progress}">${details.progress}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <strong>Next Topic:</strong>
+                    <div class="text-primary">${details.nextTopic}</div>
+                </div>
+            </div>
+            
+            <strong>Course Topics:</strong>
+            <ul class="list-unstyled mt-2">
+                ${details.topics.map(topic => `<li><i class="fas fa-check-circle text-success me-2"></i>${topic}</li>`).join('')}
+            </ul>
+            
+            <div class="text-center mt-4">
+                <button class="btn btn-primary me-2" onclick="startCourseQuiz('${courseTitle}')">
+                    <i class="fas fa-play me-1"></i>Start Quiz
+                </button>
+                <button class="btn btn-outline-primary" onclick="continueCourse('${courseTitle}')">
+                    <i class="fas fa-book me-1"></i>Continue Course
+                </button>
+            </div>
+        </div>
+    `;
+    
+    showModal(`${courseTitle} - Course Details`, detailsHTML);
+}
+
+function continueCourse(courseTitle) {
+    showNotification(`Continuing ${courseTitle} course...`, 'info');
+    const modal = document.querySelector('.modal.show');
+    if (modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+    }
+}
+
+function startQuiz(quizTitle) {
+    showNotification(`Opening ${quizTitle} in new page...`, 'success');
+    
+    // Close the modal first
+    const modal = document.querySelector('.modal.show');
+    if (modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+    }
+    
+    // Simulate opening quiz in new page
+    setTimeout(() => {
+        // Create a URL-friendly quiz identifier
+        const quizId = quizTitle.toLowerCase().replace(/\s+/g, '-');
+        const quizUrl = `quiz.html?quiz=${encodeURIComponent(quizId)}&title=${encodeURIComponent(quizTitle)}`;
+        
+        // Open quiz in new tab/window
+        window.open(quizUrl, '_blank');
+        
+        showNotification(`${quizTitle} opened in new tab!`, 'info');
+    }, 500);
+}
+
+function showFlashcardCollections() {
+    const flashcardSets = [
+        { title: 'Mathematics', subject: 'Calculus & Algebra', color: 'primary' },
+        { title: 'Computer Science', subject: 'ML & Algorithms', color: 'success' },
+        { title: 'Physics', subject: 'Constants & Formulas', color: 'info' },
+        { title: 'Programming', subject: 'Python & JavaScript', color: 'warning' },
+        { title: 'Statistics', subject: 'Terms & Concepts', color: 'secondary' },
+        { title: 'Data Science', subject: 'Data Structures & Analysis', color: 'danger' }
+    ];
+    
+    let flashcardHTML = '<div class="row">';
+    flashcardSets.forEach(set => {
+        flashcardHTML += `
+            <div class="col-md-6 mb-3">
+                <div class="card course-flashcard-card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="course-icon bg-${set.color}">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="card-title mb-1">${set.title}</h6>
+                                <small class="text-muted">${set.subject}</small>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <button class="btn btn-${set.color} btn-sm flex-grow-1" onclick="startCourseFlashcards('${set.title}')">
+                                <i class="fas fa-play me-1"></i>Study Flashcards
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    flashcardHTML += '</div>';
+    
+    showModal('Available Courses for Flashcards', flashcardHTML);
+}
+
+function startCourseFlashcards(courseTitle) {
+    showFlashcardConfigForm(courseTitle);
+}
+
+function showFlashcardConfigForm(courseTitle) {
+    const configHTML = `
+        <form id="flashcardConfigForm">
+            <div class="mb-3">
+                <label for="flashcardTopic" class="form-label">Topic <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="flashcardTopic" placeholder="Enter specific topic (e.g., Derivatives, Machine Learning Basics)" required>
+                <div class="form-text">Specify the topic you want to study with flashcards</div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="flashcardCount" class="form-label">Number of Cards</label>
+                    <select class="form-select" id="flashcardCount">
+                        <option value="10">10 Cards (Quick Review)</option>
+                        <option value="20" selected>20 Cards (Standard)</option>
+                        <option value="30">30 Cards (Extended)</option>
+                        <option value="50">50 Cards (Intensive)</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="flashcardDifficulty" class="form-label">Difficulty Level</label>
+                    <select class="form-select" id="flashcardDifficulty">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate" selected>Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="mixed">Mixed Levels</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="flashcardType" class="form-label">Study Mode</label>
+                <select class="form-select" id="flashcardType">
+                    <option value="standard">Standard (Question → Answer)</option>
+                    <option value="reverse">Reverse (Answer → Question)</option>
+                    <option value="mixed" selected>Mixed Mode</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-play me-2"></i>Start Flashcard Session
+                </button>
+            </div>
+        </form>
+    `;
+    
+    showModal(`Configure ${courseTitle} Flashcards`, configHTML);
+    
+    // Add form submission handler
+    setTimeout(() => {
+        const form = document.getElementById('flashcardConfigForm');
+        if (form) {
+            form.addEventListener('submit', (e) => startConfiguredFlashcards(e, courseTitle));
+        }
+    }, 100);
+}
+
+function startConfiguredFlashcards(event, courseTitle) {
+    event.preventDefault();
+    
+    const topic = document.getElementById('flashcardTopic').value;
+    const count = document.getElementById('flashcardCount').value;
+    const difficulty = document.getElementById('flashcardDifficulty').value;
+    const type = document.getElementById('flashcardType').value;
+    
+    if (!topic.trim()) {
+        showNotification('Please enter a topic for your flashcards', 'error');
+        return;
+    }
+    
+    // Close the modal
+    const modal = document.querySelector('.modal.show');
+    if (modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+    }
+    
+    // Create flashcard session
+    setTimeout(() => {
+        const flashcardUrl = `flashcards.html?course=${encodeURIComponent(courseTitle)}&topic=${encodeURIComponent(topic)}&count=${count}&difficulty=${difficulty}&type=${type}`;
+        
+        showNotification('Opening personalized flashcard session...', 'success');
+        window.open(flashcardUrl, '_blank');
+        
+        setTimeout(() => {
+            showNotification('Flashcard session started! 🃏', 'info');
+        }, 1000);
+    }, 500);
+}
+
+function studyFlashcards(setTitle) {
+    showNotification(`Opening ${setTitle} flashcards...`, 'success');
+    
+    // Close the modal first
+    const modal = document.querySelector('.modal.show');
+    if (modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+    }
+    
+    // Simulate opening flashcards in new page
+    setTimeout(() => {
+        // Create a URL-friendly flashcard identifier
+        const flashcardId = setTitle.toLowerCase().replace(/\s+/g, '-');
+        const flashcardUrl = `flashcards.html?set=${encodeURIComponent(flashcardId)}&title=${encodeURIComponent(setTitle)}`;
+        
+        // Open flashcards in new tab/window
+        window.open(flashcardUrl, '_blank');
+        
+        showNotification(`${setTitle} flashcards opened in new tab!`, 'info');
+    }, 500);
+}
+
+function showMindmapOptions() {
+    const mindmapTemplates = [
+        { 
+            title: 'Course Overview', 
+            subject: 'General', 
+            description: 'Create a comprehensive overview of your current courses',
+            icon: 'fa-sitemap',
+            color: 'primary'
+        },
+        { 
+            title: 'Study Plan', 
+            subject: 'Planning', 
+            description: 'Organize your study schedule and goals visually',
+            icon: 'fa-calendar-alt',
+            color: 'success'
+        },
+        { 
+            title: 'Concept Map', 
+            subject: 'Learning', 
+            description: 'Map relationships between different concepts',
+            icon: 'fa-network-wired',
+            color: 'info'
+        },
+        { 
+            title: 'Problem Solving', 
+            subject: 'Strategy', 
+            description: 'Break down complex problems step by step',
+            icon: 'fa-puzzle-piece',
+            color: 'warning'
+        },
+        { 
+            title: 'Research Notes', 
+            subject: 'Research', 
+            description: 'Organize research findings and sources',
+            icon: 'fa-search',
+            color: 'purple'
+        },
+        { 
+            title: 'Custom Mindmap', 
+            subject: 'Creative', 
+            description: 'Start with a blank canvas for custom ideas',
+            icon: 'fa-lightbulb',
+            color: 'danger'
+        }
+    ];
+    
+    let mindmapHTML = '<div class="row">';
+    mindmapTemplates.forEach(template => {
+        mindmapHTML += `
+            <div class="col-md-6 mb-3">
+                <div class="card mindmap-template-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="mindmap-icon bg-${template.color} me-3">
+                                <i class="fas ${template.icon} text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="card-title mb-1">${template.title}</h6>
+                                <small class="text-muted">${template.subject}</small>
+                            </div>
+                        </div>
+                        <p class="card-text">${template.description}</p>
+                        <button class="btn btn-${template.color} btn-sm w-100" onclick="createMindmap('${template.title}')">
+                            <i class="fas fa-plus me-1"></i>Create Mindmap
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    mindmapHTML += '</div>';
+    
+    showModal('Mindmap Generator', mindmapHTML);
+}
+
+function createMindmap(templateTitle) {
+    showMindmapConfigForm(templateTitle);
+}
+
+function showMindmapConfigForm(templateTitle) {
+    const configHTML = `
+        <form id="mindmapConfigForm">
+            <div class="mb-3">
+                <label for="mindmapTopic" class="form-label">Central Topic <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="mindmapTopic" placeholder="Enter main topic (e.g., Machine Learning, Calculus)" required>
+                <div class="form-text">Specify the central topic for your mindmap</div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="mindmapSubject" class="form-label">Subject Area</label>
+                    <select class="form-select" id="mindmapSubject">
+                        <option value="general">General</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="computer-science">Computer Science</option>
+                        <option value="literature">Literature</option>
+                        <option value="history">History</option>
+                        <option value="business">Business</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="mindmapComplexity" class="form-label">Complexity Level</label>
+                    <select class="form-select" id="mindmapComplexity">
+                        <option value="simple">Simple (3-5 branches)</option>
+                        <option value="moderate" selected>Moderate (6-8 branches)</option>
+                        <option value="complex">Complex (9-12 branches)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="mindmapStyle" class="form-label">Visual Style</label>
+                <select class="form-select" id="mindmapStyle">
+                    <option value="modern" selected>Modern</option>
+                    <option value="classic">Classic</option>
+                    <option value="colorful">Colorful</option>
+                    <option value="minimal">Minimal</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-magic me-2"></i>Generate Mindmap
+                </button>
+            </div>
+        </form>
+    `;
+    
+    showModal(`Configure ${templateTitle}`, configHTML);
+    
+    // Add form submission handler
+    setTimeout(() => {
+        const form = document.getElementById('mindmapConfigForm');
+        if (form) {
+            form.addEventListener('submit', (e) => startConfiguredMindmap(e, templateTitle));
+        }
+    }, 100);
+}
+
+function startConfiguredMindmap(event, templateTitle) {
+    event.preventDefault();
+    
+    const topic = document.getElementById('mindmapTopic').value;
+    const subject = document.getElementById('mindmapSubject').value;
+    const complexity = document.getElementById('mindmapComplexity').value;
+    const style = document.getElementById('mindmapStyle').value;
+    
+    if (!topic.trim()) {
+        showNotification('Please enter a central topic for your mindmap', 'error');
+        return;
+    }
+    
+    // Close the modal
+    const modal = document.querySelector('.modal.show');
+    if (modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+    }
+    
+    // Create mindmap session
+    setTimeout(() => {
+        // Map template title to template key
+        const templateMap = {
+            'Course Overview': 'course-overview',
+            'Study Plan': 'study-plan',
+            'Concept Map': 'concept-map',
+            'Problem Solving': 'problem-solving',
+            'Research Map': 'research-map',
+            'Custom Mindmap': 'custom'
+        };
+        
+        const templateKey = templateMap[templateTitle] || 'custom';
+        const mindmapUrl = `mindmap.html?template=${templateKey}&topic=${encodeURIComponent(topic)}&subject=${subject}&complexity=${complexity}&style=${style}`;
+        
+        showNotification('Generating personalized mindmap...', 'success');
+        window.open(mindmapUrl, '_blank');
+        
+        setTimeout(() => {
+            showNotification('Mindmap created successfully! 🧠', 'info');
+        }, 1000);
+    }, 500);
+}
+
+function showAboutModal() {
+    const aboutContent = `
+        <div class="text-center mb-4">
+            <i class="fas fa-graduation-cap text-primary" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">Personalized AI-Powered Learning Platform</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h5>🎯 Our Mission</h5>
+                <p>To revolutionize education through AI-powered personalized learning experiences that adapt to each student's unique learning style and pace.</p>
+                
+                <h5>🚀 Key Features</h5>
+                <ul>
+                    <li><strong>AI-Powered Recommendations:</strong> Personalized study suggestions based on your performance</li>
+                    <li><strong>Interactive Learning:</strong> Engaging quizzes, flashcards, and practice exercises</li>
+                    <li><strong>Progress Tracking:</strong> Comprehensive analytics to monitor your learning journey</li>
+                    <li><strong>Achievement System:</strong> Earn badges and certificates as you reach milestones</li>
+                    <li><strong>Adaptive Content:</strong> Content that adjusts to your skill level and learning preferences</li>
+                </ul>
+                
+                <h5>📊 Platform Statistics</h5>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h4 class="text-primary">10K+</h4>
+                        <small>Active Students</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-success">500+</h4>
+                        <small>Courses Available</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-warning">95%</h4>
+                        <small>Success Rate</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    showModal('About Our Platform', aboutContent);
+}
+
+function showFeedbackModal() {
+    const feedbackContent = `
+        <form id="feedbackForm">
+            <div class="mb-3">
+                <label class="form-label">How would you rate your overall experience?</label>
+                <div class="d-flex gap-2 justify-content-center mb-3">
+                    <button type="button" class="btn btn-outline-warning rating-btn" data-rating="1">⭐</button>
+                    <button type="button" class="btn btn-outline-warning rating-btn" data-rating="2">⭐⭐</button>
+                    <button type="button" class="btn btn-outline-warning rating-btn" data-rating="3">⭐⭐⭐</button>
+                    <button type="button" class="btn btn-outline-warning rating-btn" data-rating="4">⭐⭐⭐⭐</button>
+                    <button type="button" class="btn btn-outline-warning rating-btn" data-rating="5">⭐⭐⭐⭐⭐</button>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">What do you like most about the platform?</label>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="aiRecommendations">
+                            <label class="form-check-label" for="aiRecommendations">AI Recommendations</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="progressTracking">
+                            <label class="form-check-label" for="progressTracking">Progress Tracking</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="userInterface">
+                            <label class="form-check-label" for="userInterface">User Interface</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="quizSystem">
+                            <label class="form-check-label" for="quizSystem">Quiz System</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="flashcards">
+                            <label class="form-check-label" for="flashcards">Flashcards</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="achievements">
+                            <label class="form-check-label" for="achievements">Achievements</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Any suggestions for improvement?</label>
+                <textarea class="form-control" rows="4" placeholder="Share your thoughts on how we can make the platform better..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Contact Email (optional)</label>
+                <input type="email" class="form-control" placeholder="your.email@example.com">
+            </div>
+        </form>
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+    `;
+    
+    showModal('Share Your Feedback', feedbackContent);
+    
+    // Add rating button functionality
+    setTimeout(() => {
+        const ratingBtns = document.querySelectorAll('.rating-btn');
+        ratingBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                ratingBtns.forEach(b => b.classList.remove('btn-warning', 'btn-outline-warning'));
+                ratingBtns.forEach(b => b.classList.add('btn-outline-warning'));
+                
+                const rating = parseInt(this.dataset.rating);
+                for(let i = 0; i < rating; i++) {
+                    ratingBtns[i].classList.remove('btn-outline-warning');
+                    ratingBtns[i].classList.add('btn-warning');
+                }
+            });
+        });
+    }, 100);
+}
+
+function submitFeedback() {
+    showNotification('Thank you for your feedback! We appreciate your input.', 'success');
+    const modal = document.querySelector('.modal.show');
+    if (modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+    }
+}
+
+function showAchievements() {
+    // Simulated student progress data (in real app, this would come from backend)
+    const studentProgress = {
+        quizzesCompleted: 12,
+        totalQuizScore: 1050, // Total points across all quizzes
+        averageQuizScore: 87.5, // Average percentage
+        highestQuizScore: 98,
+        flashcardsStudied: 250,
+        studyStreak: 8, // Current streak in days
+        totalStudyTime: 45, // Total hours
+        perfectQuizzes: 3, // Number of 100% quizzes
+        coursesCompleted: 2,
+        mindmapsCreated: 5,
+        weeklyGoalsMet: 4,
+        difficultTopicsMastered: 6,
+        helpSessionsAttended: 3,
+        notesCreated: 18,
+        practiceProblems: 156
+    };
+
+    // Define achievements with unlock criteria
+    const achievementDefinitions = [
+        // Beginner Achievements
+        {
+            id: 'first_quiz',
+            title: 'First Steps',
+            description: 'Complete your first quiz',
+            icon: 'fa-play-circle',
+            color: 'text-primary',
+            category: 'beginner',
+            criteria: { quizzesCompleted: 11 },
+            points: 10
+        },
+        {
+            id: 'flashcard_starter',
+            title: 'Memory Builder',
+            description: 'Study 25 flashcards',
+            icon: 'fa-layer-group',
+            color: 'text-info',
+            category: 'beginner',
+            criteria: { flashcardsStudied: 25 },
+            points: 15
+        },
+        {
+            id: 'early_bird',
+            title: 'Early Bird',
+            description: 'Start a 3-day study streak',
+            icon: 'fa-sun',
+            color: 'text-warning',
+            category: 'beginner',
+            criteria: { studyStreak: 3 },
+            points: 20
+        },
+
+        // Intermediate Achievements
+        {
+            id: 'quiz_enthusiast',
+            title: 'Quiz Enthusiast',
+            description: 'Complete 10 quizzes',
+            icon: 'fa-clipboard-check',
+            color: 'text-success',
+            category: 'intermediate',
+            criteria: { quizzesCompleted: 13 },
+            points: 25
+        },
+        {
+            id: 'consistent_learner',
+            title: 'Consistent Learner',
+            description: 'Maintain a 7-day study streak',
+            icon: 'fa-fire',
+            color: 'text-danger',
+            category: 'intermediate',
+            criteria: { studyStreak: 7 },
+            points: 30
+        },
+        {
+            id: 'flashcard_master',
+            title: 'Flashcard Master',
+            description: 'Study 200+ flashcards',
+            icon: 'fa-cards-blank',
+            color: 'text-purple',
+            category: 'intermediate',
+            criteria: { flashcardsStudied: 255 },
+            points: 35
+        },
+        {
+            id: 'scholar',
+            title: 'Scholar',
+            description: 'Achieve 85%+ average quiz score',
+            icon: 'fa-graduation-cap',
+            color: 'text-primary',
+            category: 'intermediate',
+            criteria: { averageQuizScore: 90 },
+            points: 40
+        },
+
+        // Advanced Achievements
+        {
+            id: 'perfectionist',
+            title: 'Perfectionist',
+            description: 'Score 100% on 3 quizzes',
+            icon: 'fa-gem',
+            color: 'text-info',
+            category: 'advanced',
+            criteria: { perfectQuizzes: 6 },
+            points: 50
+        },
+        {
+            id: 'quiz_master',
+            title: 'Quiz Master',
+            description: 'Score 90%+ on 5 quizzes',
+            icon: 'fa-star',
+            color: 'text-success',
+            category: 'advanced',
+            criteria: { highestQuizScore: 100, quizzesCompleted: 5 },
+            points: 45
+        },
+        {
+            id: 'marathon_learner',
+            title: 'Marathon Learner',
+            description: 'Study for 40+ total hours',
+            icon: 'fa-clock',
+            color: 'text-warning',
+            category: 'advanced',
+            criteria: { totalStudyTime: 40 },
+            points: 55
+        },
+
+        // // Expert Achievements
+        // {
+        //     id: 'course_conqueror',
+        //     title: 'Course Conqueror',
+        //     description: 'Complete 2 full courses',
+        //     icon: 'fa-trophy',
+        //     color: 'text-warning',
+        //     category: 'expert',
+        //     criteria: { coursesCompleted: 2 },
+        //     points: 60
+        // },
+        // {
+        //     id: 'problem_solver',
+        //     title: 'Problem Solver',
+        //     description: 'Solve 150+ practice problems',
+        //     icon: 'fa-puzzle-piece',
+        //     color: 'text-success',
+        //     category: 'expert',
+        //     criteria: { practiceProblems: 150 },
+        //     points: 65
+        // },
+        // {
+        //     id: 'dedication_master',
+        //     title: 'Dedication Master',
+        //     description: 'Maintain a 14-day study streak',
+        //     icon: 'fa-medal',
+        //     color: 'text-danger',
+        //     category: 'expert',
+        //     criteria: { studyStreak: 14 },
+        //     points: 70
+        // },
+
+        // // Legendary Achievements
+        // {
+        //     id: 'study_legend',
+        //     title: 'Study Legend',
+        //     description: 'Achieve 95%+ average with 20+ quizzes',
+        //     icon: 'fa-crown',
+        //     color: 'text-warning',
+        //     category: 'legendary',
+        //     criteria: { averageQuizScore: 95, quizzesCompleted: 20 },
+        //     points: 100
+        // },
+        // {
+        //     id: 'knowledge_seeker',
+        //     title: 'Knowledge Seeker',
+        //     description: 'Master 5+ difficult topics',
+        //     icon: 'fa-brain',
+        //     color: 'text-purple',
+        //     category: 'legendary',
+        //     criteria: { difficultTopicsMastered: 5 },
+        //     points: 90
+        // },
+        // {
+        //     id: 'ultimate_scholar',
+        //     title: 'Ultimate Scholar',
+        //     description: 'Complete 500+ flashcards',
+        //     icon: 'fa-infinity',
+        //     color: 'text-primary',
+        //     category: 'legendary',
+        //     criteria: { flashcardsStudied: 500 },
+        //     points: 120
+        // }
+    ];
+
+    // Check which achievements are unlocked
+    const achievements = achievementDefinitions.map(achievement => {
+        const unlocked = checkAchievementCriteria(achievement.criteria, studentProgress);
+        return {
+            ...achievement,
+            unlocked
+        };
+    });
+
+    // Calculate total points earned
+    const totalPoints = achievements
+        .filter(a => a.unlocked)
+        .reduce((sum, a) => sum + a.points, 0);
+
+    // Group achievements by category
+    const achievementsByCategory = {
+        beginner: achievements.filter(a => a.category === 'beginner'),
+        intermediate: achievements.filter(a => a.category === 'intermediate'),
+        advanced: achievements.filter(a => a.category === 'advanced'),
+        // expert: achievements.filter(a => a.category === 'expert'),
+        // legendary: achievements.filter(a => a.category === 'legendary')
+    };
+
+    // Generate HTML
+    let achievementHTML = `
+        <div class="achievement-header mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-trophy text-warning me-2"></i>Your Achievements</h4>
+                    <p class="text-muted">Track your learning progress and unlock new milestones!</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="achievement-summary">
+                        <h5><span class="badge bg-primary">${achievements.filter(a => a.unlocked).length}/${achievements.length}</span> Unlocked</h5>
+                        </div>
+                </div>
+            </div>
+        </div>
+        
+       
+    `;
+
+    // Add category sections
+    Object.entries(achievementsByCategory).forEach(([category, categoryAchievements]) => {
+        const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1);
+        const categoryIcon = getCategoryIcon(category);
+        const unlockedCount = categoryAchievements.filter(a => a.unlocked).length;
+        
+        achievementHTML += `
+            <div class="achievement-category mb-4">
+                <h5 class="category-title">
+                    <i class="fas ${categoryIcon} me-2"></i>${categoryTitle} 
+                    <span class="badge bg-outline-secondary">${unlockedCount}/${categoryAchievements.length}</span>
+                </h5>
+                <div class="row">
+        `;
+        
+        categoryAchievements.forEach(achievement => {
+            const cardClass = achievement.unlocked ? 'achievement-card unlocked' : 'achievement-card locked';
+            const iconOpacity = achievement.unlocked ? '' : 'opacity-50';
+            const statusText = achievement.unlocked ? `<small class="text-success"><i class="fas fa-check-circle me-1"></i>Unlocked</small>` : '<small class="text-muted"><i class="fas fa-lock me-1"></i>Locked</small>';
+            const pointsText = achievement.unlocked ? `<span class="badge bg-warning">${achievement.points} pts</span>` : `<span class="badge bg-secondary">${achievement.points} pts</span>`;
+            
+            achievementHTML += `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card ${cardClass}">
+                        <div class="card-body text-center">
+                            <i class="fas ${achievement.icon} ${achievement.color} fa-3x mb-3 ${iconOpacity}"></i>
+                            <h6>${achievement.title}</h6>
+                            <p class="text-muted small">${achievement.description}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                ${statusText}
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        achievementHTML += '</div></div>';
+    });
+    
+    showModal('Achievements & Milestones', achievementHTML);
+}
+
+// Helper function to check if achievement criteria are met
+function checkAchievementCriteria(criteria, progress) {
+    return Object.entries(criteria).every(([key, requiredValue]) => {
+        return progress[key] >= requiredValue;
+    });
+}
+
+// Helper function to get category icon
+function getCategoryIcon(category) {
+    const icons = {
+        beginner: 'fa-seedling',
+        intermediate: 'fa-chart-line',
+        advanced: 'fa-rocket',
+        expert: 'fa-crown',
+        legendary: 'fa-dragon'
+    };
+    return icons[category] || 'fa-star';
+}
+
+function showModal(title, content) {
+    console.log('showModal called with title:', title);
+    
+    // Check if Bootstrap is available
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded!');
+        alert('Error: Bootstrap is not loaded. Please refresh the page.');
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'dynamicModal';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">${title}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    ${content}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    try {
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        
+        // Store modal instance globally for closeModal function
+        window.currentModal = bsModal;
+        window.currentModalElement = modal;
+        
+        console.log('Modal shown successfully');
+        
+        // Remove modal from DOM when hidden
+        modal.addEventListener('hidden.bs.modal', function() {
+            console.log('Modal hidden, removing from DOM');
+            modal.remove();
+            window.currentModal = null;
+            window.currentModalElement = null;
+        });
+    } catch (error) {
+        console.error('Error creating modal:', error);
+        alert('Error creating modal: ' + error.message);
+    }
+}
+
+function closeModal() {
+    console.log('closeModal called');
+    if (window.currentModal) {
+        console.log('Hiding current modal');
+        window.currentModal.hide();
+    } else {
+        console.log('No current modal found');
+    }
+}
+
+// Load dashboard data (simulate API calls)
+function loadDashboardData() {
+    // Simulate loading recent activities
+    updateActivityFeed();
+    
+    // Simulate loading progress data
+    updateProgressStats();
+    
+    // Update timestamps
+    updateTimestamps();
+}
+
+function updateActivityFeed() {
+    // This would typically fetch from an API
+    const activities = [
+        {
+            type: 'quiz',
+            text: 'Completed "Advanced Calculus" quiz',
+            time: '2 hours ago',
+            icon: 'fa-check',
+            color: 'bg-success'
+        },
+        {
+            type: 'ai_session',
+            text: 'Completed AI-guided Physics tutorial',
+            time: '1 day ago',
+            icon: 'fa-robot',
+            color: 'bg-primary'
+        },
+        {
+            type: 'achievement',
+            text: 'Earned "Problem Solver" badge',
+            time: '2 days ago',
+            icon: 'fa-star',
+            color: 'bg-warning'
+        }
+    ];
+    
+    // Activities are already in HTML, this would update them if needed
+}
+
+function updateProgressStats() {
+    // Simulate real-time progress updates
+    const progressElements = document.querySelectorAll('.progress-bar');
+    
+    progressElements.forEach(bar => {
+        // Add slight random variation to simulate progress
+        const currentWidth = parseFloat(bar.style.width);
+        if (currentWidth && currentWidth < 100) {
+            const newWidth = Math.min(currentWidth + Math.random() * 2, 100);
+            bar.style.width = newWidth + '%';
+        }
+    });
+}
+
+function updateTimestamps() {
+    // Update relative timestamps
+    const timeElements = document.querySelectorAll('small.text-muted');
+    timeElements.forEach(el => {
+        if (el.textContent.includes('ago')) {
+            // This would update relative timestamps in a real application
+        }
+    });
+}
+
+function updateRealTimeData() {
+    // Update data every 5 minutes
+    setInterval(() => {
+        updateProgressStats();
+        updateTimestamps();
+    }, 300000);
+}
+
+// Dark mode toggle (enhanced)
+function toggleDarkMode() {
+    const body = document.body;
+    const toggleIcon = document.getElementById('darkModeToggle');
+    
+    body.classList.toggle('dark-mode');
+    
+    // Update icon based on current mode
+    if (body.classList.contains('dark-mode')) {
+        toggleIcon.className = 'fas fa-sun text-warning';
+        toggleIcon.parentElement.title = 'Switch to Light Mode';
+        showNotification('Dark mode activated 🌙', 'info');
+    } else {
+        toggleIcon.className = 'fas fa-moon text-light';
+        toggleIcon.parentElement.title = 'Toggle Dark Mode';
+        showNotification('Light mode activated ☀️', 'info');
+    }
+    
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+}
+
+// Initialize dark mode from localStorage
+function initializeDarkMode() {
+    const toggleIcon = document.getElementById('darkModeToggle');
+    
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        toggleIcon.className = 'fas fa-sun text-warning';
+        toggleIcon.parentElement.title = 'Switch to Light Mode';
+    } else {
+        toggleIcon.className = 'fas fa-moon text-light';
+        toggleIcon.parentElement.title = 'Toggle Dark Mode';
+    }
+}
+
+// Search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            // Implement search through courses, activities, etc.
+            performSearch(query);
+        });
+    }
+}
+
+function performSearch(query) {
+    // This would implement actual search functionality
+    if (query.length > 2) {
+        showNotification(`Searching for: ${query}`, 'info');
+    }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + K for search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+    
+    // Ctrl/Cmd + B for AI tutor
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        e.preventDefault();
+        handleAITutorChat();
+    }
+});
+
+// Performance optimization
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Lazy loading for charts (if needed)
+function lazyLoadCharts() {
+    const chartElements = document.querySelectorAll('canvas');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Initialize chart when it comes into view
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+    
+    chartElements.forEach(el => observer.observe(el));
+}
+
+// Notification System
+function showNotifications() {
+    // Close any existing notification popup
+    const existingPopup = document.querySelector('.notification-popup');
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+
+    // Sample notification data - in real app, this would come from API
+    const notifications = [
+        {
+            id: 1,
+            type: 'success',
+            icon: 'fa-trophy',
+            title: 'Quiz Completed!',
+            message: 'Great job! You scored 92% in Advanced Mathematics quiz.',
+            time: '2 minutes ago',
+            read: false
+        },
+        {
+            id: 2,
+            type: 'info',
+            icon: 'fa-book',
+            title: 'New Study Material',
+            message: 'Machine Learning fundamentals chapter has been updated with new examples.',
+            time: '1 hour ago',
+            read: false
+        },
+        {
+            id: 3,
+            type: 'warning',
+            icon: 'fa-clock',
+            title: 'Assignment Reminder',
+            message: 'Physics assignment is due in 2 days. Don\'t forget to submit!',
+            time: '3 hours ago',
+            read: false
+        },
+        {
+            id: 4,
+            type: 'info',
+            icon: 'fa-users',
+            title: 'Study Group Invitation',
+            message: 'Sarah invited you to join the Calculus study group session tomorrow.',
+            time: '5 hours ago',
+            read: true
+        },
+        {
+            id: 5,
+            type: 'success',
+            icon: 'fa-medal',
+            title: 'Achievement Unlocked',
+            message: 'You\'ve earned the "Quick Learner" badge for completing 5 quizzes in a row!',
+            time: '1 day ago',
+            read: true
+        }
+    ];
+
+    // Create notification popup
+    const notificationPopup = document.createElement('div');
+    notificationPopup.className = 'notification-popup';
+    
+    notificationPopup.innerHTML = `
+        <div class="notification-header">
+            <h6 class="mb-0">
+                <i class="fas fa-bell me-2"></i>Notifications
+                <span class="notification-count">${notifications.filter(n => !n.read).length}</span>
+            </h6>
+            <div class="notification-actions">
+                <button class="btn-mark-all-read" onclick="markAllAsRead()" title="Mark all as read">
+                    <i class="fas fa-check-double"></i>
+                </button>
+                <button class="btn-close-notifications" onclick="closeNotifications()" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="notification-body">
+            ${notifications.map(notification => `
+                <div class="notification-item ${notification.read ? 'read' : 'unread'}" data-id="${notification.id}">
+                    <div class="notification-icon ${notification.type}">
+                        <i class="fas ${notification.icon}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="notification-time">
+                            <i class="fas fa-clock me-1"></i>${notification.time}
+                        </div>
+                    </div>
+                    <div class="notification-status">
+                        ${!notification.read ? '<div class="unread-dot"></div>' : ''}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="notification-footer">
+            <a href="#" class="view-all-link" onclick="viewAllNotifications()">
+                <i class="fas fa-external-link-alt me-1"></i>View All Notifications
+            </a>
+        </div>
+    `;
+
+    // Position the popup relative to the bell icon
+    const bellElement = document.getElementById('notificationBell');
+    const rect = bellElement.getBoundingClientRect();
+    
+    notificationPopup.style.position = 'fixed';
+    notificationPopup.style.top = (rect.bottom + 10) + 'px';
+    notificationPopup.style.right = '20px';
+    notificationPopup.style.zIndex = '9999';
+
+    document.body.appendChild(notificationPopup);
+
+    // Add click handlers to notification items
+    const notificationItems = notificationPopup.querySelectorAll('.notification-item');
+    notificationItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const notificationId = item.dataset.id;
+            markNotificationAsRead(notificationId);
+        });
+    });
+
+    // Close popup when clicking outside
+    setTimeout(() => {
+        document.addEventListener('click', closeNotificationsOutside);
+    }, 100);
+}
+
+function closeNotifications() {
+    const popup = document.querySelector('.notification-popup');
+    if (popup) {
+        popup.remove();
+        document.removeEventListener('click', closeNotificationsOutside);
+    }
+}
+
+function closeNotificationsOutside(event) {
+    const popup = document.querySelector('.notification-popup');
+    const bellIcon = document.getElementById('notificationBell');
+    
+    if (popup && !popup.contains(event.target) && !bellIcon.contains(event.target)) {
+        closeNotifications();
+    }
+}
+
+function markNotificationAsRead(notificationId) {
+    const notificationItem = document.querySelector(`[data-id="${notificationId}"]`);
+    if (notificationItem && notificationItem.classList.contains('unread')) {
+        notificationItem.classList.remove('unread');
+        notificationItem.classList.add('read');
+        
+        // Remove the unread dot
+        const unreadDot = notificationItem.querySelector('.unread-dot');
+        if (unreadDot) {
+            unreadDot.remove();
+        }
+        
+        // Update notification count
+        updateNotificationCount();
+        showNotification('Notification marked as read', 'success');
+    }
+}
+
+function markAllAsRead() {
+    const unreadItems = document.querySelectorAll('.notification-item.unread');
+    unreadItems.forEach(item => {
+        item.classList.remove('unread');
+        item.classList.add('read');
+        
+        const unreadDot = item.querySelector('.unread-dot');
+        if (unreadDot) {
+            unreadDot.remove();
+        }
+    });
+    
+    updateNotificationCount();
+    showNotification('All notifications marked as read', 'success');
+}
+
+function updateNotificationCount() {
+    const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+    const countBadge = document.getElementById('notificationCount');
+    const headerCount = document.querySelector('.notification-count');
+    
+    if (unreadCount === 0) {
+        countBadge.style.display = 'none';
+        if (headerCount) headerCount.textContent = '0';
+    } else {
+        countBadge.style.display = 'inline';
+        countBadge.textContent = unreadCount;
+        if (headerCount) headerCount.textContent = unreadCount;
+    }
+}
+
+function viewAllNotifications() {
+    closeNotifications();
+    showNotification('Opening full notifications page...', 'info');
+    // In a real app, this would navigate to a full notifications page
+}
+
+// Export functions for potential module use
+window.dashboardFunctions = {
+    handleAITutorChat,
+    showNotification,
+    toggleDarkMode,
+    showNotifications
+};

@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindmap Generator - AI Study Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboard-styles.css">
+    
+    <style>
+        .mindmap-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .mindmap-canvas {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            min-height: 600px;
+            border: 2px solid #dee2e6;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mindmap-node {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            padding: 15px 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #007bff;
+            font-weight: 600;
+            color: #333;
+            user-select: none;
+        }
+        
+        .mindmap-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .mindmap-node.central {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            font-size: 1.2rem;
+            border-color: #004085;
+            transform: scale(1.1);
+        }
+        
+        .mindmap-node.level-1 {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            border-color: #155724;
+        }
+        
+        .mindmap-node.level-2 {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #333;
+            border-color: #d39e00;
+        }
+        
+        .mindmap-node.level-3 {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border-color: #0c5460;
+        }
+        
+        .mindmap-connection {
+            position: absolute;
+            background: #6c757d;
+            transform-origin: left center;
+            height: 3px;
+            border-radius: 2px;
+            z-index: 1;
+        }
+        
+        .mindmap-controls {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .node-editor {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .template-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #dee2e6;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #007bff;
+        }
+        
+        .template-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .export-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .loader-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        body.dark-mode .mindmap-canvas {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border-color: #374151;
+        }
+        
+        body.dark-mode .mindmap-node {
+            background: #374151;
+            color: #e5e7eb;
+            border-color: #4b5563;
+        }
+        
+        body.dark-mode .mindmap-controls {
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .node-editor {
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .template-card {
+            background: #374151;
+            color: #e5e7eb;
+            border-color: #4b5563;
+        }
+        
+        body.dark-mode .loader-content {
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            .mindmap-container {
+                padding: 1rem;
+            }
+            
+            .mindmap-canvas {
+                min-height: 400px;
+            }
+            
+            .mindmap-node {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .template-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="student-dashboard.html">
+                <i class="fas fa-graduation-cap me-2"></i>
+                AI Study Platform
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item me-3">
+                    <a class="nav-link" href="#" title="Toggle Dark Mode" onclick="toggleDarkMode()">
+                        <i class="fas fa-moon text-light" id="darkModeToggle"></i>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" href="student-dashboard.html">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <!-- Mindmap Configuration Section -->
+        <div id="mindmapConfig" class="mindmap-container">
+            <div class="text-center mb-4">
+                <h2><i class="fas fa-project-diagram me-2"></i>AI Mindmap Generator</h2>
+                <p class="text-muted">Create visual learning maps to organize your knowledge</p>
+            </div>
+
+            <!-- Template Selection -->
+            <div class="mindmap-controls">
+                <h5 class="mb-3"><i class="fas fa-palette me-2"></i>Choose a Template</h5>
+                <div class="template-selector">
+                    <div class="template-card" onclick="selectTemplate('course-overview')">
+                        <div class="template-icon text-primary">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        <h6>Course Overview</h6>
+                        <p class="text-muted">Comprehensive course structure</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('study-plan')">
+                        <div class="template-icon text-success">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h6>Study Plan</h6>
+                        <p class="text-muted">Organize your study schedule</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('concept-map')">
+                        <div class="template-icon text-info">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h6>Concept Map</h6>
+                        <p class="text-muted">Connect related concepts</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('problem-solving')">
+                        <div class="template-icon text-warning">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <h6>Problem Solving</h6>
+                        <p class="text-muted">Break down complex problems</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('research-map')">
+                        <div class="template-icon text-danger">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h6>Research Map</h6>
+                        <p class="text-muted">Organize research findings</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('custom')">
+                        <div class="template-icon text-secondary">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <h6>Custom</h6>
+                        <p class="text-muted">Start from scratch</p>
+                    </div>
+                </div>
+                
+                <!-- Configuration Form -->
+                <div id="mindmapConfigForm" style="display: none;">
+                    <hr class="my-4">
+                    <form id="configForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mindmapTopic" class="form-label">Central Topic <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="mindmapTopic" placeholder="Enter main topic" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mindmapSubject" class="form-label">Subject Area</label>
+                                <select class="form-select" id="mindmapSubject">
+                                    <option value="general">General</option>
+                                    <option value="mathematics">Mathematics</option>
+                                    <option value="science">Science</option>
+                                    <option value="computer-science">Computer Science</option>
+                                    <option value="literature">Literature</option>
+                                    <option value="history">History</option>
+                                    <option value="business">Business</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mindmapComplexity" class="form-label">Complexity Level</label>
+                                <select class="form-select" id="mindmapComplexity">
+                                    <option value="simple">Simple (3-5 branches)</option>
+                                    <option value="moderate" selected>Moderate (6-8 branches)</option>
+                                    <option value="complex">Complex (9-12 branches)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mindmapStyle" class="form-label">Visual Style</label>
+                                <select class="form-select" id="mindmapStyle">
+                                    <option value="modern" selected>Modern</option>
+                                    <option value="classic">Classic</option>
+                                    <option value="colorful">Colorful</option>
+                                    <option value="minimal">Minimal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic me-2"></i>Generate Mindmap
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mindmap Editor Section -->
+        <div id="mindmapEditor" class="mindmap-container" style="display: none;">
+            <div class="text-center mb-4">
+                <h3 id="mindmapTitle">Your Mindmap</h3>
+                <p class="text-muted">Click on nodes to edit, drag to move</p>
+            </div>
+
+            <!-- Editor Controls -->
+            <div class="mindmap-controls">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary" onclick="addNode()">
+                                <i class="fas fa-plus me-1"></i>Add Node
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="resetZoom()">
+                                <i class="fas fa-search-plus me-1"></i>Reset View
+                            </button>
+                            <button class="btn btn-outline-info" onclick="autoLayout()">
+                                <i class="fas fa-magic me-1"></i>Auto Layout
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="export-options">
+                            <button class="export-btn btn btn-success" onclick="saveMindmap()">
+                                <i class="fas fa-save me-1"></i>Save
+                            </button>
+                            <button class="export-btn btn btn-info" onclick="exportImage()">
+                                <i class="fas fa-image me-1"></i>Export PNG
+                            </button>
+                            <button class="export-btn btn btn-warning" onclick="exportPDF()">
+                                <i class="fas fa-file-pdf me-1"></i>Export PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mindmap Canvas -->
+            <div class="mindmap-canvas" id="mindmapCanvas">
+                <!-- Mindmap nodes will be dynamically generated here -->
+            </div>
+
+            <!-- Node Editor -->
+            <div class="node-editor" id="nodeEditor">
+                <h5>Edit Node</h5>
+                <div class="mb-3">
+                    <label for="nodeText" class="form-label">Text</label>
+                    <input type="text" class="form-control" id="nodeText">
+                </div>
+                <div class="mb-3">
+                    <label for="nodeColor" class="form-label">Color</label>
+                    <select class="form-select" id="nodeColor">
+                        <option value="primary">Blue</option>
+                        <option value="success">Green</option>
+                        <option value="warning">Yellow</option>
+                        <option value="info">Cyan</option>
+                        <option value="danger">Red</option>
+                        <option value="secondary">Gray</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" onclick="saveNodeEdit()">Save</button>
+                    <button class="btn btn-secondary" onclick="cancelNodeEdit()">Cancel</button>
+                    <button class="btn btn-danger" onclick="deleteNode()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loader-overlay" id="loadingOverlay">
+        <div class="loader-content">
+            <div id="loaderStep1">
+                <div class="spinner"></div>
+                <h5>Analyzing Topic Structure...</h5>
+                <p>Processing your subject and complexity preferences</p>
+            </div>
+            <div id="loaderStep2" style="display: none;">
+                <div class="spinner"></div>
+                <h5>Generating Mindmap Layout...</h5>
+                <p>Creating visual connections and hierarchy</p>
+            </div>
+            <div id="loaderStep3" style="display: none;">
+                <div class="spinner"></div>
+                <h5>Optimizing Visual Design...</h5>
+                <p>Applying styling and positioning algorithms</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let selectedTemplate = '';
+        let mindmapData = [];
+        let currentEditingNode = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+
+        // Mindmap templates and data
+        const mindmapTemplates = {
+            'course-overview': {
+                central: 'Course Name',
+                branches: ['Syllabus', 'Assignments', 'Exams', 'Resources', 'Timeline', 'Objectives']
+            },
+            'study-plan': {
+                central: 'Study Plan',
+                branches: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Review', 'Practice']
+            },
+            'concept-map': {
+                central: 'Main Concept',
+                branches: ['Definition', 'Examples', 'Applications', 'Related Concepts', 'Key Points']
+            },
+            'problem-solving': {
+                central: 'Problem',
+                branches: ['Understand', 'Plan', 'Execute', 'Review', 'Alternative Solutions']
+            },
+            'research-map': {
+                central: 'Research Topic',
+                branches: ['Literature Review', 'Methodology', 'Data Collection', 'Analysis', 'Conclusions']
+            },
+            'custom': {
+                central: 'Central Topic',
+                branches: ['Branch 1', 'Branch 2', 'Branch 3', 'Branch 4']
+            }
+        };
+
+        // Sample subject-specific content
+        const subjectContent = {
+            'mathematics': {
+                'algebra': ['Variables', 'Equations', 'Functions', 'Graphs', 'Polynomials', 'Factoring'],
+                'calculus': ['Limits', 'Derivatives', 'Integration', 'Applications', 'Series', 'Differential Equations'],
+                'geometry': ['Points', 'Lines', 'Angles', 'Triangles', 'Circles', 'Area & Volume']
+            },
+            'science': {
+                'physics': ['Motion', 'Forces', 'Energy', 'Waves', 'Electricity', 'Magnetism'],
+                'chemistry': ['Atoms', 'Molecules', 'Reactions', 'Bonds', 'Periodic Table', 'Solutions'],
+                'biology': ['Cells', 'Genetics', 'Evolution', 'Ecosystems', 'Anatomy', 'Physiology']
+            },
+            'computer-science': {
+                'programming': ['Variables', 'Functions', 'Loops', 'Conditionals', 'Data Structures', 'Algorithms'],
+                'web-development': ['HTML', 'CSS', 'JavaScript', 'Frameworks', 'APIs', 'Databases'],
+                'data-science': ['Statistics', 'Machine Learning', 'Data Analysis', 'Visualization', 'Python', 'R']
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const template = urlParams.get('template');
+            const topic = urlParams.get('topic');
+            
+            if (template && topic) {
+                // Auto-generate mindmap from dashboard
+                selectedTemplate = template;
+                document.getElementById('mindmapTopic').value = topic;
+                autoStartMindmap();
+            }
+            
+            // Initialize form handler
+            document.getElementById('configForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateMindmap();
+            });
+            
+            // Load dark mode preference
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').className = 'fas fa-sun text-light';
+            }
+        });
+
+        function selectTemplate(templateType) {
+            selectedTemplate = templateType;
+            
+            // Highlight selected template
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.style.borderColor = '#dee2e6';
+                card.style.transform = '';
+            });
+            
+            event.currentTarget.style.borderColor = '#007bff';
+            event.currentTarget.style.transform = 'scale(1.02)';
+            
+            // Show configuration form
+            document.getElementById('mindmapConfigForm').style.display = 'block';
+            
+            // Set default topic based on template
+            const topicInput = document.getElementById('mindmapTopic');
+            if (!topicInput.value) {
+                const template = mindmapTemplates[templateType];
+                topicInput.value = template.central;
+            }
+        }
+
+        function autoStartMindmap() {
+            showTripleLoader(() => {
+                generateMindmapFromTemplate();
+                showMindmapEditor();
+            });
+        }
+
+        function generateMindmap() {
+            const topic = document.getElementById('mindmapTopic').value;
+            const subject = document.getElementById('mindmapSubject').value;
+            const complexity = document.getElementById('mindmapComplexity').value;
+            const style = document.getElementById('mindmapStyle').value;
+            
+            if (!topic.trim()) {
+                alert('Please enter a central topic');
+                return;
+            }
+            
+            showTripleLoader(() => {
+                generateMindmapFromTemplate(topic, subject, complexity, style);
+                showMindmapEditor();
+            });
+        }
+
+        function showTripleLoader(callback) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Step 1: Analyzing
+            setTimeout(() => {
+                document.getElementById('loaderStep1').style.display = 'none';
+                document.getElementById('loaderStep2').style.display = 'block';
+            }, 1500);
+            
+            // Step 2: Generating
+            setTimeout(() => {
+                document.getElementById('loaderStep2').style.display = 'none';
+                document.getElementById('loaderStep3').style.display = 'block';
+            }, 3000);
+            
+            // Step 3: Optimizing
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                // Reset loader for next time
+                document.getElementById('loaderStep3').style.display = 'none';
+                document.getElementById('loaderStep1').style.display = 'block';
+                callback();
+            }, 4500);
+        }
+
+        function generateMindmapFromTemplate(topic, subject, complexity, style) {
+            const template = mindmapTemplates[selectedTemplate] || mindmapTemplates['custom'];
+            
+            // Create central node
+            mindmapData = [{
+                id: 'central',
+                text: topic || template.central,
+                x: 400,
+                y: 300,
+                level: 'central',
+                connections: []
+            }];
+            
+            // Generate branches based on complexity
+            let branchCount = complexity === 'simple' ? 4 : complexity === 'moderate' ? 6 : 8;
+            let branches = template.branches.slice(0, branchCount);
+            
+            // Enhance branches based on subject
+            if (subject && subject !== 'general') {
+                branches = enhanceBranchesForSubject(branches, subject, topic);
+            }
+            
+            // Position branches around central node
+            const angleStep = (2 * Math.PI) / branches.length;
+            const radius = 200;
+            
+            branches.forEach((branch, index) => {
+                const angle = index * angleStep;
+                const x = 400 + Math.cos(angle) * radius;
+                const y = 300 + Math.sin(angle) * radius;
+                
+                const nodeId = `branch-${index}`;
+                mindmapData.push({
+                    id: nodeId,
+                    text: branch,
+                    x: x,
+                    y: y,
+                    level: 'level-1',
+                    connections: ['central']
+                });
+                
+                mindmapData[0].connections.push(nodeId);
+            });
+        }
+
+        function enhanceBranchesForSubject(branches, subject, topic) {
+            const enhanced = [...branches];
+            
+            // Add subject-specific branches if available
+            if (subjectContent[subject]) {
+                const topicLower = topic.toLowerCase();
+                for (const [key, content] of Object.entries(subjectContent[subject])) {
+                    if (topicLower.includes(key)) {
+                        // Replace some generic branches with specific content
+                        for (let i = 0; i < Math.min(3, content.length); i++) {
+                            if (i < enhanced.length) {
+                                enhanced[i] = content[i];
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            return enhanced;
+        }
+
+        function showMindmapEditor() {
+            document.getElementById('mindmapConfig').style.display = 'none';
+            document.getElementById('mindmapEditor').style.display = 'block';
+            
+            renderMindmap();
+        }
+
+        function renderMindmap() {
+            const canvas = document.getElementById('mindmapCanvas');
+            canvas.innerHTML = '';
+            
+            // Render connections first
+            mindmapData.forEach(node => {
+                node.connections.forEach(connectionId => {
+                    const connectedNode = mindmapData.find(n => n.id === connectionId);
+                    if (connectedNode && node.id !== connectedNode.id) {
+                        createConnection(node, connectedNode);
+                    }
+                });
+            });
+            
+            // Render nodes
+            mindmapData.forEach(node => {
+                createNode(node);
+            });
+        }
+
+        function createNode(nodeData) {
+            const canvas = document.getElementById('mindmapCanvas');
+            const node = document.createElement('div');
+            
+            node.className = `mindmap-node ${nodeData.level}`;
+            node.textContent = nodeData.text;
+            node.style.left = nodeData.x + 'px';
+            node.style.top = nodeData.y + 'px';
+            node.dataset.nodeId = nodeData.id;
+            
+            // Add event listeners
+            node.addEventListener('click', () => editNode(nodeData.id));
+            node.addEventListener('mousedown', startDrag);
+            
+            canvas.appendChild(node);
+        }
+
+        function createConnection(node1, node2) {
+            const canvas = document.getElementById('mindmapCanvas');
+            const connection = document.createElement('div');
+            
+            connection.className = 'mindmap-connection';
+            
+            const dx = node2.x - node1.x;
+            const dy = node2.y - node1.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+            
+            connection.style.left = node1.x + 'px';
+            connection.style.top = node1.y + 'px';
+            connection.style.width = length + 'px';
+            connection.style.transform = `rotate(${angle}rad)`;
+            
+            canvas.appendChild(connection);
+        }
+
+        function startDrag(e) {
+            isDragging = true;
+            const node = e.currentTarget;
+            const rect = node.getBoundingClientRect();
+            const canvas = document.getElementById('mindmapCanvas');
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const canvas = document.getElementById('mindmapCanvas');
+            const canvasRect = canvas.getBoundingClientRect();
+            const nodeId = event.target.dataset.nodeId;
+            const node = mindmapData.find(n => n.id === nodeId);
+            
+            if (node) {
+                node.x = e.clientX - canvasRect.left - dragOffset.x;
+                node.y = e.clientY - canvasRect.top - dragOffset.y;
+                renderMindmap();
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        function editNode(nodeId) {
+            if (isDragging) return;
+            
+            currentEditingNode = nodeId;
+            const node = mindmapData.find(n => n.id === nodeId);
+            
+            document.getElementById('nodeText').value = node.text;
+            document.getElementById('nodeColor').value = node.level.replace('level-', '') || 'primary';
+            document.getElementById('nodeEditor').style.display = 'block';
+        }
+
+        function saveNodeEdit() {
+            const node = mindmapData.find(n => n.id === currentEditingNode);
+            node.text = document.getElementById('nodeText').value;
+            
+            document.getElementById('nodeEditor').style.display = 'none';
+            renderMindmap();
+        }
+
+        function cancelNodeEdit() {
+            document.getElementById('nodeEditor').style.display = 'none';
+        }
+
+        function deleteNode() {
+            if (currentEditingNode === 'central') {
+                alert('Cannot delete the central node');
+                return;
+            }
+            
+            mindmapData = mindmapData.filter(n => n.id !== currentEditingNode);
+            mindmapData.forEach(node => {
+                node.connections = node.connections.filter(id => id !== currentEditingNode);
+            });
+            
+            document.getElementById('nodeEditor').style.display = 'none';
+            renderMindmap();
+        }
+
+        function addNode() {
+            const newId = 'node-' + Date.now();
+            const newNode = {
+                id: newId,
+                text: 'New Node',
+                x: 400 + Math.random() * 200 - 100,
+                y: 300 + Math.random() * 200 - 100,
+                level: 'level-2',
+                connections: ['central']
+            };
+            
+            mindmapData.push(newNode);
+            mindmapData[0].connections.push(newId);
+            renderMindmap();
+        }
+
+        function resetZoom() {
+            const canvas = document.getElementById('mindmapCanvas');
+            canvas.scrollTo(0, 0);
+        }
+
+        function autoLayout() {
+            // Simple auto-layout algorithm
+            const centralNode = mindmapData.find(n => n.id === 'central');
+            const otherNodes = mindmapData.filter(n => n.id !== 'central');
+            
+            otherNodes.forEach((node, index) => {
+                const angle = (index / otherNodes.length) * 2 * Math.PI;
+                const radius = 200;
+                node.x = centralNode.x + Math.cos(angle) * radius;
+                node.y = centralNode.y + Math.sin(angle) * radius;
+            });
+            
+            renderMindmap();
+        }
+
+        function saveMindmap() {
+            const mindmapJson = JSON.stringify(mindmapData, null, 2);
+            const blob = new Blob([mindmapJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mindmap.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Mindmap saved successfully!');
+        }
+
+        function exportImage() {
+            alert('PNG export feature will be available soon!');
+        }
+
+        function exportPDF() {
+            alert('PDF export feature will be available soon!');
+        }
+
+        function startNewMindmap() {
+            document.getElementById('mindmapEditor').style.display = 'none';
+            document.getElementById('mindmapConfig').style.display = 'block';
+            
+            // Reset form
+            document.getElementById('configForm').reset();
+            selectedTemplate = '';
+            mindmapData = [];
+            
+            // Reset template selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.style.borderColor = '#dee2e6';
+                card.style.transform = '';
+            });
+            
+            document.getElementById('mindmapConfigForm').style.display = 'none';
+        }
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('darkModeToggle');
+            icon.className = isDark ? 'fas fa-sun text-light' : 'fas fa-moon text-light';
+            localStorage.setItem('darkMode', isDark);
+        }
+    </script>
+</body>
+</html>
