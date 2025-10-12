@@ -4,7 +4,7 @@ A comprehensive student dashboard built with HTML, CSS, JavaScript, and Bootstra
 
 ## Features
 
-### 📊 Progress Tracking
+###  Progress Tracking
 - **Overall Progress**: Visual representation of student's learning journey
 - **Course Progress**: Individual course completion tracking with progress bars
 - **Study Time Monitoring**: Weekly study hours tracking and goals
