@@ -140,7 +140,7 @@ LOGIN_URL = '/users/login/'
 
 
 
-GOOGLE_API_KEY = "AIzaSyB79J1etClaGWVLZTDvIBR5r4wuuIXgp-o"
+GOOGLE_API_KEY = ""
 
 
 
